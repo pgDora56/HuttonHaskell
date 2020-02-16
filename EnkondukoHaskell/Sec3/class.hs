@@ -1,3 +1,5 @@
+import Data.List (intercalate)
+
 data Dog = Dog deriving Show
 data Cat = Cat deriving Show
 data Human = Human String deriving Show
@@ -28,6 +30,18 @@ instance Greeting Human where
 instance Laughing Human where
     laugh _ = "Hahaha"
 
+leaveWithLaugh :: Laughing a => a -> IO ()
+leaveWithLaugh x = do
+    putStrLn $ bye x
+    putStrLn $ laugh x
+
+liftGreet :: (a -> String) -> ([a] -> String)
+liftGreet f = intercalate "\n" . map f
+
+instance Greeting a => Greeting [a] where
+    name = liftGreet name
+    hello = liftGreet hello
+    bye = liftGreet bye
 
 
 sayHello :: Greeting a => a -> IO ()
@@ -42,4 +56,6 @@ main = do
         putStrLn $ bye Dog
         putStrLn $ bye Cat 
         putStrLn $ bye (Human "Takeshi")
+        leaveWithLaugh $ Human "Takeshi"
+        sayHello [Human "atsuko", Human "shingo"]
 
